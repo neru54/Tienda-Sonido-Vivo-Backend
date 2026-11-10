@@ -36,6 +36,13 @@ app:
     titulo: Sonido Vivo - Pedidos
     descripcion: "Checkout (boletas), historial de compras y reportes de ventas. Comprar es público; el resto requiere el token de POST /api/v1/auth/login (servicio Usuarios)."
 
+# Solo /actuator/health (sin detalles): lo consulta el healthcheck de Docker
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 springdoc:
   api-docs:
     path: /v3/api-docs

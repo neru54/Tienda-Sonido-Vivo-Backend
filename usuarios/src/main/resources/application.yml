@@ -32,6 +32,13 @@ app:
     titulo: Sonido Vivo - Usuarios
     descripcion: "Cuentas, login, registro de clientes y emisión del JWT. Obtén el token en POST /api/v1/auth/login y úsalo con Authorize."
 
+# Solo /actuator/health (sin detalles): lo consulta el healthcheck de Docker
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 springdoc:
   api-docs:
     path: /v3/api-docs

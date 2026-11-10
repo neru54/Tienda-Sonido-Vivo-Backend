@@ -35,6 +35,13 @@ app:
     titulo: Sonido Vivo - Catálogo
     descripcion: "Categorías, productos, ofertas y stock. Lectura pública; escritura solo Administrador (token de POST /api/v1/auth/login en el servicio Usuarios)."
 
+# Solo /actuator/health (sin detalles): lo consulta el healthcheck de Docker
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 springdoc:
   api-docs:
     path: /v3/api-docs

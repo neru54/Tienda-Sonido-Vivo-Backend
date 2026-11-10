@@ -1,0 +1,112 @@
+# ---------------------------------------------------------------
+# Sonido Vivo - backend completo con Docker:
+#   1 MySQL 8 (3 esquemas, 1 usuario por servicio) + usuarios + catalogo + pedidos + gateway.
+#
+#   cp .env.example .env      (y reemplazar los valores REEMPLAZAR_...)
+#   docker compose up --build -d
+#   docker compose ps         (esperar "healthy")
+#   http://localhost:8080/swagger-ui.html
+#
+# Solo el Gateway publica un puerto (8080). MySQL y los microservicios quedan en la red interna
+# de Docker: desde fuera no se puede llamar a /internal/** ni conectarse a la base.
+# Para usar RDS en AWS en vez de este MySQL: aws/compose.rds.yaml (ver aws/README_AWS.md).
+# ---------------------------------------------------------------
+name: sonido-vivo
+
+x-servicio: &servicio
+  restart: unless-stopped
+  environment: &entorno-comun
+    SPRING_PROFILES_ACTIVE: mysql
+    JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env (openssl rand -base64 48)}
+    JWT_EXPIRACION_MINUTOS: ${JWT_EXPIRACION_MINUTOS:-120}
+    INTERNAL_API_KEY: ${INTERNAL_API_KEY:?Define INTERNAL_API_KEY en .env (openssl rand -hex 32)}
+    DDL_AUTO: ${DDL_AUTO:-update}
+  healthcheck: &salud
+    test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/$${PORT}; printf \"GET /actuator/health HTTP/1.0\\r\\n\\r\\n\" >&3; grep -q UP <&3'"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 40s
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en .env}
+      DB_USUARIOS_USER: ${DB_USUARIOS_USER:-sv_usuarios}
+      DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD:?Define DB_USUARIOS_PASSWORD en .env}
+      DB_CATALOGO_USER: ${DB_CATALOGO_USER:-sv_catalogo}
+      DB_CATALOGO_PASSWORD: ${DB_CATALOGO_PASSWORD:?Define DB_CATALOGO_PASSWORD en .env}
+      DB_PEDIDOS_USER: ${DB_PEDIDOS_USER:-sv_pedidos}
+      DB_PEDIDOS_PASSWORD: ${DB_PEDIDOS_PASSWORD:?Define DB_PEDIDOS_PASSWORD en .env}
+    volumes:
+      - mysql-datos:/var/lib/mysql
+      - ./sql/docker:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+  usuarios:
+    <<: *servicio
+    build: { context: ., args: { MODULE: usuarios } }
+    image: sonido-vivo/usuarios:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8081
+      DB_URL: jdbc:mysql://${DB_HOST:-mysql}:${DB_PORT:-3306}/sonido_usuarios?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_USUARIOS_USER:-sv_usuarios}
+      DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
+    depends_on:
+      mysql: { condition: service_healthy }
+
+  catalogo:
+    <<: *servicio
+    build: { context: ., args: { MODULE: catalogo } }
+    image: sonido-vivo/catalogo:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8082
+      DB_URL: jdbc:mysql://${DB_HOST:-mysql}:${DB_PORT:-3306}/sonido_catalogo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_CATALOGO_USER:-sv_catalogo}
+      DB_PASSWORD: ${DB_CATALOGO_PASSWORD}
+    depends_on:
+      mysql: { condition: service_healthy }
+
+  pedidos:
+    <<: *servicio
+    build: { context: ., args: { MODULE: pedidos } }
+    image: sonido-vivo/pedidos:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8083
+      DB_URL: jdbc:mysql://${DB_HOST:-mysql}:${DB_PORT:-3306}/sonido_pedidos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_PEDIDOS_USER:-sv_pedidos}
+      DB_PASSWORD: ${DB_PEDIDOS_PASSWORD}
+      CATALOGO_URL: http://catalogo:8082
+    depends_on:
+      mysql: { condition: service_healthy }
+      catalogo: { condition: service_healthy }
+
+  gateway:
+    <<: *servicio
+    build: { context: ., args: { MODULE: gateway } }
+    image: sonido-vivo/gateway:1.0.0
+    environment:
+      PORT: 8080
+      USUARIOS_URL: http://usuarios:8081
+      CATALOGO_URL: http://catalogo:8082
+      PEDIDOS_URL: http://pedidos:8083
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:4173}
+    ports:
+      - "8080:8080"
+    depends_on:
+      usuarios: { condition: service_healthy }
+      catalogo: { condition: service_healthy }
+      pedidos: { condition: service_healthy }
+
+volumes:
+  mysql-datos:
