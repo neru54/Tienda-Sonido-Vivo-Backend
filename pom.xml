@@ -43,6 +43,7 @@
 		<module>common</module>
 		<module>usuarios</module>
 		<module>catalogo</module>
+		<module>pedidos</module>
 	</modules>
 
 	<dependencyManagement>
