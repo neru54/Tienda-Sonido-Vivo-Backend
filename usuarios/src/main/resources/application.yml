@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------
+# Microservicio usuarios - configuración común a todos los perfiles.
+# Perfil por defecto: h2 (desarrollo sin instalar nada). En Docker/AWS se usa "mysql".
+# Todo lo sensible se lee de variables de entorno; los valores después de ":" son SOLO
+# para desarrollo local (el perfil mysql exige los reales, sin valor por defecto).
+# ---------------------------------------------------------------
+server:
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: usuarios
+  profiles:
+    default: h2
+  jpa:
+    # update crea/ajusta las tablas en el primer arranque; con datos reales usar validate (DDL_AUTO=validate)
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+app:
+  # JWT: secreto Base64 COMPARTIDO con catalogo y pedidos (mínimo 32 bytes). Valor de desarrollo:
+  jwt:
+    secreto: ${JWT_SECRET:c29uaWRvLXZpdm8tY2xhdmUtZGUtZGVzYXJyb2xsby1jYW1iaWFyLWVuLXByb2R1Y2Npb24tMjAyNg==}
+    expiracion-minutos: ${JWT_EXPIRACION_MINUTOS:120}
+  # Carga de los 3 usuarios demo si la tabla está vacía
+  semilla:
+    habilitada: ${SEMILLA:true}
+  openapi:
+    titulo: Sonido Vivo - Usuarios
+    descripcion: "Cuentas, login, registro de clientes y emisión del JWT. Obtén el token en POST /api/v1/auth/login y úsalo con Authorize."
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

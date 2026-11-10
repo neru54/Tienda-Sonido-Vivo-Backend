@@ -41,6 +41,7 @@
 
 	<modules>
 		<module>common</module>
+		<module>usuarios</module>
 	</modules>
 
 	<dependencyManagement>

@@ -1,0 +1,38 @@
+[
+  {
+    "run": "11111111-1",
+    "nombre": "María",
+    "apellidos": "Pérez Soto",
+    "correo": "maria.perez@gmail.com",
+    "password": "admin123",
+    "fechaNacimiento": "1985-04-12",
+    "tipoUsuario": "Administrador",
+    "region": "Región de Valparaíso",
+    "comuna": "Viña del Mar",
+    "direccion": "Av. Libertad 1234"
+  },
+  {
+    "run": "22222222-2",
+    "nombre": "Carlos",
+    "apellidos": "Muñoz Rojas",
+    "correo": "carlos.munoz@duoc.cl",
+    "password": "vend123",
+    "fechaNacimiento": "1990-09-01",
+    "tipoUsuario": "Vendedor",
+    "region": "Región de Valparaíso",
+    "comuna": "Valparaíso",
+    "direccion": "Calle Condell 456"
+  },
+  {
+    "run": "33333333-3",
+    "nombre": "Camila",
+    "apellidos": "Rojas Vera",
+    "correo": "camila.rojas@gmail.com",
+    "password": "cli123",
+    "fechaNacimiento": "1998-02-20",
+    "tipoUsuario": "Cliente",
+    "region": "Región Metropolitana de Santiago",
+    "comuna": "Providencia",
+    "direccion": "Av. Providencia 100"
+  }
+]
