@@ -1,0 +1,37 @@
+# ---------------------------------------------------------------
+# API Gateway - punto de entrada único del frontend (sin base de datos).
+# Las URL de los servicios cambian según dónde corran:
+#   local ...... http://localhost:8081 / 8082 / 8083 (valores por defecto)
+#   Docker ..... http://usuarios:8081 / http://catalogo:8082 / http://pedidos:8083 (compose.yaml)
+# ---------------------------------------------------------------
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: gateway
+
+app:
+  usuarios-url: ${USUARIOS_URL:http://localhost:8081}
+  catalogo-url: ${CATALOGO_URL:http://localhost:8082}
+  pedidos-url: ${PEDIDOS_URL:http://localhost:8083}
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:4173}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+# Swagger agregado: http://localhost:8080/swagger-ui.html con un selector por microservicio
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Usuarios (auth y cuentas)
+        url: /openapi/usuarios
+      - name: Catálogo (productos y categorías)
+        url: /openapi/catalogo
+      - name: Pedidos (boletas y reportes)
+        url: /openapi/pedidos
+    urls-primary-name: Usuarios (auth y cuentas)

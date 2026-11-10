@@ -44,6 +44,7 @@
 		<module>usuarios</module>
 		<module>catalogo</module>
 		<module>pedidos</module>
+		<module>gateway</module>
 	</modules>
 
 	<dependencyManagement>
