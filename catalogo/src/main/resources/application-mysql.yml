@@ -1,0 +1,15 @@
+# Perfil mysql: esquema sonido_catalogo con su propio usuario MySQL (permisos solo sobre ese esquema).
+# DB_URL, DB_USER y DB_PASSWORD llegan por variables de entorno (compose.yaml o .env del servidor).
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/sonido_catalogo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8}
+    username: ${DB_USER:sv_catalogo}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# En producción el secreto es obligatorio: sin valor por defecto, el servicio no arranca si falta.
+app:
+  jwt:
+    secreto: ${JWT_SECRET}
+  internal:
+    api-key: ${INTERNAL_API_KEY}

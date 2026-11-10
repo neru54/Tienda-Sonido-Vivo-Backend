@@ -1,0 +1,62 @@
+[
+  {
+    "id": "guitarras-acusticas",
+    "nombre": "Guitarras Acústicas",
+    "descripcion": "Instrumentos y equipos de la categoría Guitarras Acústicas.",
+    "color": "#5C4530"
+  },
+  {
+    "id": "guitarras-electricas",
+    "nombre": "Guitarras Eléctricas",
+    "descripcion": "Instrumentos y equipos de la categoría Guitarras Eléctricas.",
+    "color": "#8C2F2F"
+  },
+  {
+    "id": "bajos-electricos",
+    "nombre": "Bajos Eléctricos",
+    "descripcion": "Instrumentos y equipos de la categoría Bajos Eléctricos.",
+    "color": "#3D4A3E"
+  },
+  {
+    "id": "baterias",
+    "nombre": "Baterías",
+    "descripcion": "Instrumentos y equipos de la categoría Baterías.",
+    "color": "#4A3B5C"
+  },
+  {
+    "id": "teclados-y-pianos",
+    "nombre": "Teclados y Pianos",
+    "descripcion": "Instrumentos y equipos de la categoría Teclados y Pianos.",
+    "color": "#2F5C58"
+  },
+  {
+    "id": "amplificadores",
+    "nombre": "Amplificadores",
+    "descripcion": "Instrumentos y equipos de la categoría Amplificadores.",
+    "color": "#5C3A2F"
+  },
+  {
+    "id": "microfonos",
+    "nombre": "Micrófonos",
+    "descripcion": "Instrumentos y equipos de la categoría Micrófonos.",
+    "color": "#3A4A5C"
+  },
+  {
+    "id": "pedales-de-efectos",
+    "nombre": "Pedales de Efectos",
+    "descripcion": "Instrumentos y equipos de la categoría Pedales de Efectos.",
+    "color": "#5C2F4A"
+  },
+  {
+    "id": "accesorios",
+    "nombre": "Accesorios",
+    "descripcion": "Instrumentos y equipos de la categoría Accesorios.",
+    "color": "#4A4A2F"
+  },
+  {
+    "id": "estudio-y-grabacion",
+    "nombre": "Estudio y Grabación",
+    "descripcion": "Instrumentos y equipos de la categoría Estudio y Grabación.",
+    "color": "#2F3E5C"
+  }
+]
