@@ -1,0 +1,9 @@
+**/target/
+**/data/
+.git/
+.env
+.env.*
+aws/
+docs/
+scripts/
+*.md

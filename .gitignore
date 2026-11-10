@@ -1,0 +1,25 @@
+# Compilación
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.log
+
+# Secretos: nunca subir el .env real (solo .env.example)
+.env
+.env.*
+!.env.example
+
+# Bases H2 de archivo generadas al ejecutar en local
+data/
+*.mv.db
+*.trace.db
+
+# Evidencias temporales de pruebas de humo
+scripts/salida/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
