@@ -7,6 +7,7 @@ target/
 .env
 .env.*
 !.env.example
+!*.env.aws.example
 
 # Bases H2 de archivo generadas al ejecutar en local
 data/
