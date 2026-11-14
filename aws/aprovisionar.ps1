@@ -24,7 +24,8 @@ param(
 $ErrorActionPreference = 'Stop'
 $env:AWS_DEFAULT_REGION = $Region
 
-function Aws {
+function InvocarAws {
+  $ErrorActionPreference = 'Continue'  # para que un fallo de aws muestre su mensaje real y no un NativeCommandError vacío
   $salida = & aws @args --output text 2>&1
   if ($LASTEXITCODE -ne 0) { throw "aws $($args -join ' ') -> $salida" }
   return ($salida | Out-String).Trim()
@@ -33,17 +34,17 @@ function Aws {
 if ($RdsPassword.Length -lt 8 -or $RdsPassword -match '[/@" ]') {
   throw 'La contraseña maestra de RDS debe tener 8+ caracteres y no puede contener / @ " ni espacios.'
 }
-Write-Host "Cuenta: $(Aws sts get-caller-identity --query Arn)"
+Write-Host "Cuenta: $(InvocarAws sts get-caller-identity --query Arn)"
 
 # --- 1. Red: VPC por defecto y Security Groups ---
-$vpc = Aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId'
+$vpc = InvocarAws ec2 describe-vpcs --filters 'Name=isDefault,Values=true' --query 'Vpcs[0].VpcId'
 $miIp = (Invoke-RestMethod -Uri 'https://checkip.amazonaws.com').Trim()
 Write-Host "VPC por defecto: $vpc   Tu IP pública: $miIp"
 
 function GrupoSeguridad([string]$nombre, [string]$descripcion) {
-  $id = Aws ec2 describe-security-groups --filters "Name=group-name,Values=$nombre" "Name=vpc-id,Values=$vpc" --query 'SecurityGroups[0].GroupId'
+  $id = InvocarAws ec2 describe-security-groups --filters "Name=group-name,Values=$nombre" "Name=vpc-id,Values=$vpc" --query 'SecurityGroups[0].GroupId'
   if ($id -eq 'None' -or -not $id) {
-    $id = Aws ec2 create-security-group --group-name $nombre --description $descripcion --vpc-id $vpc --query GroupId
+    $id = InvocarAws ec2 create-security-group --group-name $nombre --description $descripcion --vpc-id $vpc --query GroupId
     Write-Host "Creado $nombre ($id)"
   } else { Write-Host "Ya existe $nombre ($id)" }
   return $id
@@ -52,6 +53,7 @@ $sgEc2 = GrupoSeguridad 'sv-ec2-sg' 'Sonido Vivo EC2: SSH desde mi IP y Gateway 
 $sgRds = GrupoSeguridad 'sv-rds-sg' 'Sonido Vivo RDS: MySQL solo desde la EC2'
 
 function Permitir([string]$sg, [string[]]$regla) {
+  $ErrorActionPreference = 'Continue'
   & aws ec2 authorize-security-group-ingress --group-id $sg @regla 2>$null | Out-Null  # si ya existe, se ignora
 }
 Permitir $sgEc2 @('--protocol', 'tcp', '--port', '22', '--cidr', "$miIp/32")
@@ -61,10 +63,12 @@ Permitir $sgRds @('--protocol', 'tcp', '--port', '3306', '--source-group', $sgEc
 
 # --- 2. RDS MySQL 8 ---
 $idRds = 'sonido-vivo-mysql'
+$ErrorActionPreference = 'Continue'  # si la RDS no existe, aws escribe en stderr y con 'Stop' PowerShell lo trataría como fallo
 $existe = & aws rds describe-db-instances --db-instance-identifier $idRds --query 'DBInstances[0].DBInstanceStatus' --output text 2>$null
+$ErrorActionPreference = 'Stop'
 if ($LASTEXITCODE -ne 0) {
   Write-Host "Creando RDS $idRds ($ClaseRds, 20 GB). Tarda 5-10 minutos..."
-  Aws rds create-db-instance --db-instance-identifier $idRds --engine mysql --engine-version 8.0 `
+  InvocarAws rds create-db-instance --db-instance-identifier $idRds --engine mysql --engine-version 8.0 `
     --db-instance-class $ClaseRds --allocated-storage 20 --storage-type gp2 `
     --master-username admin --master-user-password $RdsPassword `
     --vpc-security-group-ids $sgRds --no-publicly-accessible --no-multi-az `
@@ -72,27 +76,27 @@ if ($LASTEXITCODE -ne 0) {
 } else { Write-Host "RDS $idRds ya existe (estado: $existe)" }
 
 # --- 3. EC2 Amazon Linux 2023 ---
-$ami = Aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 --query 'Parameters[0].Value'
+$ami = InvocarAws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 --query 'Parameters[0].Value'
 $userData = Join-Path $PSScriptRoot 'ec2-user-data.sh'
 Write-Host "Creando EC2 $TipoEc2 con AMI $ami..."
-$idEc2 = Aws ec2 run-instances --image-id $ami --instance-type $TipoEc2 --key-name $KeyName `
+$idEc2 = InvocarAws ec2 run-instances --image-id $ami --instance-type $TipoEc2 --key-name $KeyName `
   --security-group-ids $sgEc2 --iam-instance-profile "Name=$PerfilInstancia" `
   --user-data "file://$userData" `
   --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=20,VolumeType=gp3}' `
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=sonido-vivo-backend}]' `
   --query 'Instances[0].InstanceId'
-Aws ec2 wait instance-running --instance-ids $idEc2 | Out-Null
+InvocarAws ec2 wait instance-running --instance-ids $idEc2 | Out-Null
 
 if ($IpElastica) {
-  $alloc = Aws ec2 allocate-address --domain vpc --query AllocationId
-  Aws ec2 associate-address --instance-id $idEc2 --allocation-id $alloc | Out-Null
+  $alloc = InvocarAws ec2 allocate-address --domain vpc --query AllocationId
+  InvocarAws ec2 associate-address --instance-id $idEc2 --allocation-id $alloc | Out-Null
   Write-Host "IP elástica asociada ($alloc)"
 }
-$ip = Aws ec2 describe-instances --instance-ids $idEc2 --query 'Reservations[0].Instances[0].PublicIpAddress'
+$ip = InvocarAws ec2 describe-instances --instance-ids $idEc2 --query 'Reservations[0].Instances[0].PublicIpAddress'
 
 Write-Host 'Esperando que RDS quede disponible...'
-Aws rds wait db-instance-available --db-instance-identifier $idRds | Out-Null
-$endpoint = Aws rds describe-db-instances --db-instance-identifier $idRds --query 'DBInstances[0].Endpoint.Address'
+InvocarAws rds wait db-instance-available --db-instance-identifier $idRds | Out-Null
+$endpoint = InvocarAws rds describe-db-instances --db-instance-identifier $idRds --query 'DBInstances[0].Endpoint.Address'
 
 Write-Host ''
 Write-Host 'Listo:' -ForegroundColor Green
