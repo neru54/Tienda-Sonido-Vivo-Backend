@@ -84,7 +84,7 @@ El contenedor MySQL ejecuta `sql/docker/01_init.sh` la primera vez: crea los esq
 
 ### 4. En AWS Academy
 
-RDS MySQL 8 + EC2 con Docker + frontend en S3: ver [`aws/README_AWS.md`](aws/README_AWS.md).
+RDS MySQL 8 + EC2 con Docker + frontend en S3: archivos en `aws/` (`aprovisionar.ps1`, `compose.rds.yaml`, `ec2-user-data.sh`, `.env.aws.example`).
 
 ## Swagger
 
@@ -93,7 +93,7 @@ RDS MySQL 8 + EC2 con Docker + frontend en S3: ver [`aws/README_AWS.md`](aws/REA
 1. En **Usuarios**, ejecuta `POST /api/v1/auth/login` y copia el `token`.
 2. Pulsa **Authorize** y pégalo. Al cambiar de documento, vuelve a autorizar con el mismo token.
 
-Especificaciones exportadas: `docs/openapi/usuarios.json`, `catalogo.json` y `pedidos.json`.
+Especificaciones OpenAPI: el Gateway las sirve en `/openapi/usuarios`, `/openapi/catalogo` y `/openapi/pedidos` con el sistema en ejecución.
 
 ## Cuentas de demostración
 
@@ -113,7 +113,7 @@ powershell -ExecutionPolicy Bypass -File scripts\humo.ps1    # de punta a punta 
 powershell -ExecutionPolicy Bypass -File scripts\humo.ps1 -Gateway http://<ip-ec2>:8080
 ```
 
-Último resultado (10-11-2026): **97 pruebas, 0 fallos**. Por módulo: common 21, usuarios 19, catalogo 24, pedidos 27 y gateway 6. JaCoCo: 93,0 % de instrucciones y 92,6 % de líneas (informe en `<módulo>/target/site/jacoco/index.html`). Prueba de humo: 38/38 con Docker + MySQL y 38/38 con H2 (`docs/evidencias/`).
+Último resultado (10-11-2026): **97 pruebas, 0 fallos**. Por módulo: common 21, usuarios 19, catalogo 24, pedidos 27 y gateway 6. JaCoCo: 93,0 % de instrucciones y 92,6 % de líneas (informe en `<módulo>/target/site/jacoco/index.html`). Prueba de humo: 38/38 con Docker + MySQL y 38/38 con H2.
 
 Las pruebas usan H2 en memoria (`src/test/resources/application-h2.yml`) y no necesitan MySQL. En `pedidos`, el cliente de catálogo se simula con Mockito, y además se prueba contra un servidor HTTP falso.
 
@@ -125,4 +125,4 @@ Las pruebas usan H2 en memoria (`src/test/resources/application-h2.yml`) y no ne
 | [`docs/APIs_e_Integracion.md`](docs/APIs_e_Integracion.md) | Arquitectura, modelo por esquema, endpoints por servicio y rol, flujo JWT, llamada interna y pruebas |
 | [`docs/Manual_de_Usuario.md`](docs/Manual_de_Usuario.md) | Manual por rol, con la lista de capturas por tomar |
 | [`docs/Mapa_Rubrica.md`](docs/Mapa_Rubrica.md) | Evidencia de cada indicador de la rúbrica |
-| [`aws/README_AWS.md`](aws/README_AWS.md) | Despliegue en AWS Academy y plan B |
+| [`aws/`](aws/) | Scripts y compose de despliegue en AWS Academy |

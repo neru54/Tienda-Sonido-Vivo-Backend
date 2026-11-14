@@ -100,4 +100,4 @@ Write-Host "  EC2:          $idEc2   IP pública: $ip"
 Write-Host "  RDS endpoint: $endpoint  (DB_HOST del .env de la EC2)"
 Write-Host "  SSH:          ssh -i labsuser.pem ec2-user@$ip"
 Write-Host "  API:          http://${ip}:8080/api/v1   (cuando los contenedores estén arriba)"
-Write-Host 'Siguiente: aws/README_AWS.md, paso 4 (clonar el repo, .env, SQL y docker compose).'
+Write-Host 'Siguiente: clonar el repo en la EC2, crear .env desde aws/.env.aws.example, ejecutar sql/01_crear_esquemas_mysql.sql y levantar aws/compose.rds.yaml.'

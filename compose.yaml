@@ -9,7 +9,7 @@
 #
 # Solo el Gateway publica un puerto (8080). MySQL y los microservicios quedan en la red interna
 # de Docker: desde fuera no se puede llamar a /internal/** ni conectarse a la base.
-# Para usar RDS en AWS en vez de este MySQL: aws/compose.rds.yaml (ver aws/README_AWS.md).
+# Para usar RDS en AWS en vez de este MySQL: aws/compose.rds.yaml.
 # ---------------------------------------------------------------
 name: sonido-vivo
 

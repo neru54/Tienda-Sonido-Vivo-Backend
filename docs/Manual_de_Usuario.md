@@ -38,7 +38,7 @@ Este manual explica cómo usar la tienda online **Sonido Vivo** y su panel de ad
 2. Frontend: en `fase3/proyecto_Etapa3_REACT`, ejecuta `npm install` y luego `npm run dev`. Usa `VITE_API_URL=http://localhost:8080/api/v1`, que es el valor por defecto.
 3. Abre `http://localhost:5173`.
 
-En AWS el procedimiento está en `aws/README_AWS.md`.
+En AWS se usan los scripts de `aws/` (RDS + EC2 con Docker).
 
 ![Pantalla 01 — Sistema en funcionamiento](capturas/01-sistema-en-funcionamiento.png)
 *Pantalla 01. Terminal con `docker compose ps` mostrando mysql, usuarios, catalogo, pedidos y gateway en estado "healthy" (solo gateway con el puerto 0.0.0.0:8080), y otra terminal con `npm run dev` mostrando `http://localhost:5173`.*

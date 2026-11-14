@@ -218,7 +218,7 @@ sequenceDiagram
 
 ## 4. Endpoints por microservicio
 
-Base: `http://<gateway>:8080/api/v1`. Son 27 operaciones públicas (las mismas del monolito) y 2 internas. El detalle de esquemas y ejemplos está en Swagger y en `docs/openapi/{usuarios,catalogo,pedidos}.json`, exportados desde el Gateway en ejecución.
+Base: `http://<gateway>:8080/api/v1`. Son 27 operaciones públicas (las mismas del monolito) y 2 internas. El detalle de esquemas y ejemplos está en Swagger (`/swagger-ui.html`) y en los documentos OpenAPI que sirve el Gateway en `/openapi/{usuarios,catalogo,pedidos}`.
 
 ### 4.1 usuarios (8081)
 
@@ -379,8 +379,8 @@ La suite escrita para el monolito (mismos servicios `src/api/*` contra la API re
 
 | Entorno | Resultado | Evidencia |
 |---|---|---|
-| `docker compose` (MySQL 8.4 + 4 servicios) | **38 comprobaciones OK, 0 fallas** | `docs/evidencias/humo-docker-mysql.txt` |
-| Plan B sin Docker (`scripts/iniciar-h2.ps1`, H2) | **38 comprobaciones OK, 0 fallas** | `docs/evidencias/humo-local-h2.txt` |
+| `docker compose` (MySQL 8.4 + 4 servicios) | **38 comprobaciones OK, 0 fallas** | `scripts/humo.ps1` |
+| Plan B sin Docker (`scripts/iniciar-h2.ps1`, H2) | **38 comprobaciones OK, 0 fallas** | `scripts/humo.ps1` |
 
 Comprueba: health del Gateway; login de los 3 roles y 401 con contraseña incorrecta; catálogo público; compra sin sesión (`run` null) y con sesión y cupón (`run` 33333333-3); stock descontado en cada compra; la compra aparece en *Mis compras*; 409 por stock sin cambiar el stock; `Idempotency-Key` (misma boleta, un solo descuento); 4 lecturas permitidas y 8 rutas con 403 para el Vendedor; 403 del Cliente en la lista de boletas, en una boleta ajena y en reportes; Admin en reportes, críticos, usuarios e historial; 401 del invitado; `/internal/ventas` con 404 desde fuera.
 
@@ -432,4 +432,4 @@ npm run test:integracion   # con el backend levantado
 npm run dev                # http://localhost:5173
 ```
 
-Despliegue en AWS Academy: `aws/README_AWS.md`.
+Despliegue en AWS Academy: scripts en `aws/`.

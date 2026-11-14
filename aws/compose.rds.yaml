@@ -7,7 +7,7 @@
 #
 # .env (en el servidor, nunca en git) debe tener DB_HOST = endpoint de RDS, por ejemplo
 #   sonido-vivo-mysql.xxxxxxxx.us-east-1.rds.amazonaws.com
-# Ver aws/.env.aws.example y aws/README_AWS.md.
+# Ver aws/.env.aws.example.
 #
 # Memoria: una t3.small tiene 2 GB. Cada servicio queda limitado a 420 MB y la JVM usa el 75 %
 # de eso (MaxRAMPercentage en el Dockerfile). El user-data crea además 2 GB de swap.

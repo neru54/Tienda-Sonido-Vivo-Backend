@@ -66,7 +66,7 @@ Sonido Vivo es una tienda online de instrumentos musicales, audio y accesorios (
 - DSY1104 — Evaluación Parcial 3, Anexo 1: Instrucciones (roles, modelo de datos propuesto, criterios de evaluación).
 - Referencia de microservicios entregada por el docente (GameTech EV3: `common` + 3 microservicios + Gateway).
 - ERS v3.0 (06-11-2026, monolito) y v2.1 (16-10-2026).
-- **APIs e Integración** (`docs/APIs_e_Integracion.md`), especificaciones **OpenAPI** (`docs/openapi/*.json`), **Manual de usuario** (`docs/Manual_de_Usuario.md`), **mapa de la rúbrica** (`docs/Mapa_Rubrica.md`) y guía **AWS** (`aws/README_AWS.md`).
+- **APIs e Integración** (`docs/APIs_e_Integracion.md`), especificaciones **OpenAPI** (servidas por el Gateway en `/openapi/*`), **Manual de usuario** (`docs/Manual_de_Usuario.md`), **mapa de la rúbrica** (`docs/Mapa_Rubrica.md`) y scripts de despliegue **AWS** (`aws/`).
 - Documentación de React, Vite, Vitest, axios, Spring Boot 3.5, Spring Cloud Gateway, Spring Security, Spring Data JPA, springdoc-openapi, jjwt, Docker y AWS (RDS, EC2, S3).
 
 ---
@@ -113,7 +113,7 @@ Roles definidos por el enunciado de la Evaluación 3:
 - **R-09** El pago y el envío de la boleta por email siguen siendo **simulados**.
 - **R-10** Regiones y comunas: las 6 regiones de `src/utils/regiones-comunas.js` (heredado).
 - **R-11** Ejecución con **Docker** (`Dockerfile` multimódulo con `ARG MODULE` y `compose.yaml`). Solo el Gateway publica un puerto (8080).
-- **R-12** Despliegue objetivo en **AWS Academy**: una RDS MySQL 8 no pública, una EC2 con Docker y el frontend en S3 (`aws/README_AWS.md`).
+- **R-12** Despliegue objetivo en **AWS Academy**: una RDS MySQL 8 no pública, una EC2 con Docker y el frontend en S3 (`aws/`).
 
 ### 2.4 Supuestos y dependencias
 - **S-01** El navegador soporta JavaScript moderno, `localStorage` y `sessionStorage`.
@@ -188,7 +188,7 @@ Prioridad: **A** alta, **M** media. **(v3)** = requisito modificado en esta vers
 | RF-35 **(v3.1)** | El checkout debe hacerse **sin confiar en los montos del cliente**. `pedidos` valida el cupón y pide a `catalogo` los precios vigentes. `catalogo` agrupa ítems, bloquea por código en orden, valida el stock de **todos** (si uno falla: 409 y no descuenta nada), descuenta en una transacción y devuelve precio, nombre y categoría. `pedidos` calcula subtotal, descuento y total y guarda BOLETA + DETALLE_BOLETA | A |
 | RF-36 **(v3.1)** | Se debe poder **comprar sin iniciar sesión**. Con un token válido la boleta guarda el RUN del token; sin token, `usuario_run` queda NULL. Los datos del comprador y de la entrega se copian en la boleta | A |
 | RF-37 | Una boleta solo la puede consultar el **personal** o su **dueño**: un cliente que pide la boleta de otra persona recibe 403 y un visitante 401 | A |
-| RF-38 **(v3.1)** | Cada microservicio publica su OpenAPI 3 (`/v3/api-docs`). El **Gateway** ofrece una sola **Swagger UI** (`/swagger-ui.html`) con un selector Usuarios, Catálogo y Pedidos, y con el esquema Bearer. Los documentos se exportan en `docs/openapi/` | A |
+| RF-38 **(v3.1)** | Cada microservicio publica su OpenAPI 3 (`/v3/api-docs`). El **Gateway** ofrece una sola **Swagger UI** (`/swagger-ui.html`) con un selector Usuarios, Catálogo y Pedidos, y con el esquema Bearer. Los documentos los sirve el Gateway en `/openapi/{usuarios,catalogo,pedidos}` | A |
 | RF-39 **(v3.1)** | Los tres microservicios responden los errores con el **mismo JSON** (`estado`, `error`, `mensaje`, `ruta`, `fecha` y `errores` por campo), definido una sola vez en `common` | M |
 | RF-40 | Si el backend responde 401 a una petición que llevaba token (sesión vencida), el frontend cierra la sesión y avisa "Tu sesión expiró…" | M |
 | RF-41 **(v3.1)** | Un producto que ya se vendió **no se puede eliminar** (409). `catalogo` lo sabe por su propio comprobante de ventas (`venta_registrada`), sin consultar el esquema de pedidos | M |
@@ -225,7 +225,7 @@ Prioridad: **A** alta, **M** media. **(v3)** = requisito modificado en esta vers
 | RNF-07 **(v3.1)** | Seguridad | Contraseñas protegidas, acceso por rol, datos sensibles fuera del código, red interna protegida | BCrypt; JWT HS256 con vencimiento y secreto solo en variables de entorno; servicios sin estado (CSRF no aplica); CORS solo en el Gateway, limitado a `CORS_ORIGINS`; clave de servicio con comparación en tiempo constante; solo el puerto 8080 publicado; contenedores con usuario sin privilegios; la API nunca devuelve la contraseña |
 | RNF-08 | Seguridad en el cliente | El frontend no es la barrera de seguridad | El rol de la sesión solo decide qué se muestra; toda operación se autoriza en el servidor |
 | RNF-09 **(v3.1)** | Configurabilidad | Cambiar de H2 a MySQL local o a RDS sin tocar código | Perfiles `h2` y `mysql`; `DB_URL`, `DB_USER`, `DB_PASSWORD` por servicio, `JWT_SECRET`, `INTERNAL_API_KEY`, `CATALOGO_URL`, `CORS_ORIGINS`; `VITE_API_URL` en el frontend |
-| RNF-10 **(v3.1)** | Documentación de API | Cualquier integrante puede conocer y probar la API sin leer el código | Swagger UI agregado en el Gateway, con descripciones, códigos de respuesta y Authorize; `docs/openapi/*.json` |
+| RNF-10 **(v3.1)** | Documentación de API | Cualquier integrante puede conocer y probar la API sin leer el código | Swagger UI agregado en el Gateway, con descripciones, códigos de respuesta y Authorize; documentos en `/openapi/*` del Gateway |
 | RNF-11 **(v3.1)** | Testabilidad | Lógica de negocio probada en cada servicio, más pruebas de punta a punta | 97 pruebas de backend (JUnit 5, Mockito, MockMvc, DataJpaTest), cobertura JaCoCo del 92,6 % de líneas; 192 pruebas de frontend; 6 de integración real; humo con 38 comprobaciones |
 | RNF-12 | Identidad de marca | Nombre, colores y logo de Sonido Vivo | Heredado de la v2 |
 | RNF-13 **(v3.1)** | Portabilidad | Ejecutar igual en cualquier equipo o en la nube | Maven Wrapper, bytecode Java 21, imágenes Docker, `compose.yaml` y plan B sin Docker (`scripts/iniciar-h2.ps1`) |
@@ -283,7 +283,7 @@ Sin cambios respecto a la v3.0: las rutas de la tienda y del panel son las misma
 | Comunicación interna | `RestClient` de Spring con tiempo máximo | pedidos → catalogo con `X-Internal-Api-Key` |
 | Documentación | springdoc-openapi 2.8 | Un OpenAPI por servicio y la Swagger UI en el Gateway |
 | Contenedores | Docker, `compose.yaml` (MySQL 8.4 + 4 servicios) | Healthchecks, solo el 8080 publicado |
-| Nube (preparado) | AWS Academy: RDS MySQL 8, EC2 Amazon Linux 2023, S3 | `aws/README_AWS.md`, `aws/aprovisionar.ps1`, `aws/compose.rds.yaml` |
+| Nube (preparado) | AWS Academy: RDS MySQL 8, EC2 Amazon Linux 2023, S3 | `aws/aprovisionar.ps1`, `aws/compose.rds.yaml` |
 | Pruebas | JUnit 5, Mockito, MockMvc, spring-security-test, DataJpaTest, JaCoCo; Vitest | Por servicio, de integración real y de humo |
 
 **Decisiones de diseño (para la exposición oral):**
@@ -362,7 +362,7 @@ Sin cambios respecto a la v3.0: las rutas de la tienda y del panel son las misma
 
 | ID | Tema | Estado / mitigación |
 |---|---|---|
-| P-01 | Despliegue en AWS Academy | Preparado y no ejecutado: `aws/README_AWS.md` y `aws/aprovisionar.ps1`. Plan B local documentado |
+| P-01 | Despliegue en AWS Academy | Preparado y no ejecutado: `aws/aprovisionar.ps1`. Plan B local documentado |
 | P-02 | HTTPS | El sitio web de S3 y el Gateway son HTTP. Con CloudFront (HTTPS) la API también debe ser HTTPS (ver la guía AWS) |
 | P-03 | Transacción distribuida | No existe; si se pierde dos veces la respuesta de catálogo, la boleta queda *Pendiente* con stock descontado hasta reintentar con la misma `Idempotency-Key` (RF-47). No hay conciliación automática |
 | P-04 | Secreto JWT compartido (HS256) | Quien valida podría firmar; se mitiga guardando el secreto solo en el servidor. Mejora futura: RS256 con clave pública |
