@@ -105,24 +105,4 @@ Especificaciones OpenAPI: el Gateway las sirve en `/openapi/usuarios`, `/openapi
 
 Las carga la semilla de `usuarios` si la tabla está vacía (contraseñas con BCrypt). `catalogo` carga 10 categorías y 51 productos; `pedidos` empieza vacío.
 
-## Pruebas
 
-```powershell
-.\mvnw.cmd clean verify                                     # pruebas de todos los módulos + JaCoCo
-powershell -ExecutionPolicy Bypass -File scripts\humo.ps1    # de punta a punta contra el Gateway en marcha
-powershell -ExecutionPolicy Bypass -File scripts\humo.ps1 -Gateway http://<ip-ec2>:8080
-```
-
-Último resultado (10-11-2026): **97 pruebas, 0 fallos**. Por módulo: common 21, usuarios 19, catalogo 24, pedidos 27 y gateway 6. JaCoCo: 93,0 % de instrucciones y 92,6 % de líneas (informe en `<módulo>/target/site/jacoco/index.html`). Prueba de humo: 38/38 con Docker + MySQL y 38/38 con H2.
-
-Las pruebas usan H2 en memoria (`src/test/resources/application-h2.yml`) y no necesitan MySQL. En `pedidos`, el cliente de catálogo se simula con Mockito, y además se prueba contra un servidor HTTP falso.
-
-## Documentación
-
-| Documento | Contenido |
-|---|---|
-| [`docs/ERS_v3.md`](docs/ERS_v3.md) | Requisitos (v3.1, microservicios) y matriz de trazabilidad |
-| [`docs/APIs_e_Integracion.md`](docs/APIs_e_Integracion.md) | Arquitectura, modelo por esquema, endpoints por servicio y rol, flujo JWT, llamada interna y pruebas |
-| [`docs/Manual_de_Usuario.md`](docs/Manual_de_Usuario.md) | Manual por rol, con la lista de capturas por tomar |
-| [`docs/Mapa_Rubrica.md`](docs/Mapa_Rubrica.md) | Evidencia de cada indicador de la rúbrica |
-| [`aws/`](aws/) | Scripts y compose de despliegue en AWS Academy |
