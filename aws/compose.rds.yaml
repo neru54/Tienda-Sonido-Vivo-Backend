@@ -1,0 +1,82 @@
+# ---------------------------------------------------------------
+# Backend usando Amazon RDS (MySQL 8) en vez del contenedor MySQL.
+# Mismos 4 servicios que compose.yaml, sin el servicio "mysql". Se ejecuta desde la raíz del repo.
+#
+# El .env del servidor (nunca en git) debe tener DB_HOST = endpoint de RDS. Ver aws/.env.aws.example.
+#
+# Memoria: cada servicio queda limitado a 420 MB y la JVM usa el 75 % de eso
+# (MaxRAMPercentage en el Dockerfile), pensado para una instancia de 2 GB.
+# ---------------------------------------------------------------
+name: sonido-vivo
+
+x-servicio: &servicio
+  restart: unless-stopped
+  mem_limit: 420m
+  environment: &entorno-comun
+    SPRING_PROFILES_ACTIVE: mysql
+    JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env}
+    JWT_EXPIRACION_MINUTOS: ${JWT_EXPIRACION_MINUTOS:-120}
+    INTERNAL_API_KEY: ${INTERNAL_API_KEY:?Define INTERNAL_API_KEY en .env}
+    DDL_AUTO: ${DDL_AUTO:-update}
+  healthcheck:
+    test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/$${PORT}; printf \"GET /actuator/health HTTP/1.0\\r\\n\\r\\n\" >&3; grep -q UP <&3'"]
+    interval: 15s
+    timeout: 5s
+    retries: 20
+    start_period: 90s
+
+services:
+  usuarios:
+    <<: *servicio
+    build: { context: .., args: { MODULE: usuarios } }
+    image: sonido-vivo/usuarios:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8081
+      DB_URL: jdbc:mysql://${DB_HOST:?Define DB_HOST (endpoint de RDS)}:${DB_PORT:-3306}/sonido_usuarios?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_USUARIOS_USER:-sv_usuarios}
+      DB_PASSWORD: ${DB_USUARIOS_PASSWORD:?Define DB_USUARIOS_PASSWORD}
+
+  catalogo:
+    <<: *servicio
+    build: { context: .., args: { MODULE: catalogo } }
+    image: sonido-vivo/catalogo:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8082
+      DB_URL: jdbc:mysql://${DB_HOST}:${DB_PORT:-3306}/sonido_catalogo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_CATALOGO_USER:-sv_catalogo}
+      DB_PASSWORD: ${DB_CATALOGO_PASSWORD:?Define DB_CATALOGO_PASSWORD}
+
+  pedidos:
+    <<: *servicio
+    build: { context: .., args: { MODULE: pedidos } }
+    image: sonido-vivo/pedidos:1.0.0
+    environment:
+      <<: *entorno-comun
+      PORT: 8083
+      DB_URL: jdbc:mysql://${DB_HOST}:${DB_PORT:-3306}/sonido_pedidos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      DB_USER: ${DB_PEDIDOS_USER:-sv_pedidos}
+      DB_PASSWORD: ${DB_PEDIDOS_PASSWORD:?Define DB_PEDIDOS_PASSWORD}
+      CATALOGO_URL: http://catalogo:8082
+    depends_on:
+      catalogo: { condition: service_healthy }
+
+  gateway:
+    <<: *servicio
+    mem_limit: 320m
+    build: { context: .., args: { MODULE: gateway } }
+    image: sonido-vivo/gateway:1.0.0
+    environment:
+      PORT: 8080
+      USUARIOS_URL: http://usuarios:8081
+      CATALOGO_URL: http://catalogo:8082
+      PEDIDOS_URL: http://pedidos:8083
+      # Agrega aquí (en .env) la URL del sitio S3 del frontend
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8080:8080"
+    depends_on:
+      usuarios: { condition: service_healthy }
+      catalogo: { condition: service_healthy }
+      pedidos: { condition: service_healthy }
