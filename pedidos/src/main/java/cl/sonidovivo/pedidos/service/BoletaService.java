@@ -32,7 +32,7 @@ import cl.sonidovivo.pedidos.model.Cupon;
 import cl.sonidovivo.pedidos.repository.BoletaRepository;
 
 /**
- * Checkout y consulta de boletas. En el monolito era UNA transacción; ahora el stock está en otro
+ * Checkout y consulta de boletas. El stock está en otro
  * servicio, así que la compra es una secuencia de pasos (sin transacción distribuida):
  *
  *  1. Se valida el carrito y el cupón (400) ANTES de tocar nada.

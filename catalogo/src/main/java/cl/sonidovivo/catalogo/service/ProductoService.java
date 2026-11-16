@@ -19,12 +19,12 @@ import cl.sonidovivo.common.exception.ReglaNegocioException;
 import cl.sonidovivo.common.util.Textos;
 
 /**
- * Reglas de productos (las mismas del monolito):
+ * Reglas de productos:
  *  - El código es único y no se cambia al editar.
  *  - La categoría debe existir.
  *  - Si está en oferta, el precio de oferta es obligatorio y no puede superar el precio normal.
  *  - Stock crítico por defecto = 3.
- *  - No se puede eliminar un producto que ya se vendió. En el monolito se miraba DETALLE_BOLETA; aquí
+ *  - No se puede eliminar un producto que ya se vendió. Para saberlo
  *    se mira el comprobante propio de catalogo (VENTA_REGISTRADA), porque no puede leer el esquema de pedidos.
  */
 @Service

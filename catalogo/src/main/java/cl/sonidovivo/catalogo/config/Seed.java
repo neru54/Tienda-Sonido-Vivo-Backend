@@ -23,7 +23,7 @@ import cl.sonidovivo.catalogo.repository.CategoriaRepository;
 import cl.sonidovivo.catalogo.repository.ProductoRepository;
 
 /**
- * Carga las 10 categorías y 51 productos de la tienda (los mismos JSON del monolito, en
+ * Carga las 10 categorías y 51 productos de la tienda (JSON en
  * resources/semilla) cuando las tablas están vacías. Se desactiva con SEMILLA=false.
  */
 @Component

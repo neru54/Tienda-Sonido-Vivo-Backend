@@ -19,7 +19,7 @@ flowchart LR
   P -->|/internal/ventas + X-Internal-Api-Key| C
 ```
 
-Cada microservicio sigue la misma organización: `controller` → `service` → `repository` → `model`, con `dto`, `exception` y `config` (más `client` y `mapper` en pedidos). No hay relaciones JPA ni claves foráneas entre esquemas. Los servicios se referencian por ID (RUN, código de producto) y se comunican por HTTP. El frontend está en `../proyecto_Etapa3_REACT` y el monolito anterior, como respaldo, en `../sonido-vivo-api`.
+Cada microservicio sigue la misma organización: `controller` → `service` → `repository` → `model`, con `dto`, `exception` y `config` (más `client` y `mapper` en pedidos). No hay relaciones JPA ni claves foráneas entre esquemas. Los servicios se referencian por ID (RUN, código de producto) y se comunican por HTTP. El frontend está en `../proyecto_Etapa3_REACT`.
 
 ## Requisitos
 
@@ -39,7 +39,7 @@ Copia `.env.example` como `.env` y reemplaza todos los valores `REEMPLAZAR_...`.
 | `INTERNAL_API_KEY` | catalogo, pedidos | Clave de la llamada interna pedidos → catalogo. Generar con `openssl rand -hex 32` |
 | `CORS_ORIGINS` | gateway | Orígenes del frontend separados por coma (por defecto `http://localhost:5173,http://localhost:4173`) |
 | `MYSQL_ROOT_PASSWORD` | contenedor MySQL | Solo para `compose.yaml` |
-| `DB_HOST`, `DB_PORT` | compose | Host de MySQL (`mysql` en Docker, endpoint de RDS en AWS) |
+| `DB_HOST`, `DB_PORT` | compose | Host de MySQL (`mysql` en Docker, `localhost` en local) |
 | `DB_USUARIOS_USER` / `_PASSWORD`, `DB_CATALOGO_USER` / `_PASSWORD`, `DB_PEDIDOS_USER` / `_PASSWORD` | cada servicio | Usuario MySQL de cada esquema (`sv_usuarios`, `sv_catalogo`, `sv_pedidos`) |
 | `DDL_AUTO` | servicios | `update` crea las tablas en el primer arranque; después conviene `validate` |
 
@@ -82,10 +82,6 @@ docker compose down             # detiene y conserva los datos (no uses -v si qu
 
 El contenedor MySQL ejecuta `sql/docker/01_init.sh` la primera vez: crea los esquemas y usuarios con las contraseñas del `.env`. **Solo el Gateway publica un puerto (8080)**; los microservicios y MySQL quedan en la red interna de Docker.
 
-### 4. En AWS Academy
-
-RDS MySQL 8 + EC2 con Docker + frontend en S3: archivos en `aws/` (`aprovisionar.ps1`, `compose.rds.yaml`, `ec2-user-data.sh`, `.env.aws.example`).
-
 ## Swagger
 
 <http://localhost:8080/swagger-ui.html>: un selector con un documento por servicio (Usuarios, Catálogo y Pedidos).
@@ -105,4 +101,13 @@ Especificaciones OpenAPI: el Gateway las sirve en `/openapi/usuarios`, `/openapi
 
 Las carga la semilla de `usuarios` si la tabla está vacía (contraseñas con BCrypt). `catalogo` carga 10 categorías y 51 productos; `pedidos` empieza vacío.
 
+## Pruebas
 
+```powershell
+.\mvnw.cmd clean verify                                     # pruebas de todos los módulos + JaCoCo
+powershell -ExecutionPolicy Bypass -File scripts\humo.ps1    # de punta a punta contra el Gateway en marcha
+```
+
+Último resultado (15-11-2026): **45 pruebas, 0 fallos**. Por módulo: common 4, usuarios 10, catalogo 15, pedidos 14 y gateway 2. JaCoCo: 76,4 % de instrucciones y 75,1 % de líneas (informe en `<módulo>/target/site/jacoco/index.html`).
+
+Las pruebas se concentran en lo importante: reglas de negocio de cada servicio con Mockito (`UsuarioServiceTest`, `CatalogoReglasTest`, `VentaServiceTest`, `BoletaServiceTest`), el JWT (`JwtUtilTest`), una prueba de API por servicio para login y permisos por rol, y el enrutamiento del Gateway. Usan H2 en memoria (`src/test/resources/application-h2.yml`) y no necesitan MySQL; en `pedidos`, el cliente de catálogo se simula con Mockito.

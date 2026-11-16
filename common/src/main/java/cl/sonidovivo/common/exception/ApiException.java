@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 /**
  * Excepción de negocio con su código HTTP. Las subclases (404, 409, 400, 503) dejan el código
- * explícito en el nombre, igual que en el monolito, y ApiErrors las traduce todas con un solo método.
+ * explícito en el nombre, y ApiErrors las traduce todas con un solo método.
  */
 public class ApiException extends RuntimeException {
 

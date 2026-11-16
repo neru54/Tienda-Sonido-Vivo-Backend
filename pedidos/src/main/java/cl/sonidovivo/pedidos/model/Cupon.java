@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Cupones de descuento vigentes (los mismos del monolito). Viven en pedidos porque el descuento
+ * Cupones de descuento vigentes. Viven en pedidos porque el descuento
  * se aplica sobre el subtotal de la boleta, después de que catalogo informa los precios reales.
  */
 public enum Cupon {

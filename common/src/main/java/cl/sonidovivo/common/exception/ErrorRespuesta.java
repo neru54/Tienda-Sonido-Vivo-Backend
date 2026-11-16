@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * Formato único de error de TODOS los microservicios (el mismo del monolito).
+ * Formato único de error de TODOS los microservicios.
  * El frontend solo lee el campo "mensaje", así que no importa qué servicio respondió.
  */
 @Schema(description = "Respuesta de error")

@@ -20,13 +20,13 @@ import cl.sonidovivo.usuarios.model.Usuario;
 import cl.sonidovivo.usuarios.repository.UsuarioRepository;
 
 /**
- * Reglas de usuarios (las mismas del monolito):
+ * Reglas de usuarios:
  *  - RUN válido (dígito verificador) y único; correo único (sin distinguir mayúsculas).
  *  - Contraseña obligatoria al crear (4 a 10 caracteres); al editar, vacía = se conserva. Se guarda con BCrypt.
  *  - Nadie puede eliminarse a sí mismo.
  *  - En el perfil propio no se puede cambiar RUN, correo ni tipo de usuario.
  *
- * Cambio respecto del monolito: al eliminar un usuario sus boletas NO se tocan. Están en otro
+ * Al eliminar un usuario sus boletas NO se tocan. Están en otro
  * microservicio (pedidos) y conservan el RUN como referencia histórica del comprador; el RUN es un
  * identificador único de la persona, por lo que sigue apuntando a quien compró.
  */

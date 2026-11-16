@@ -5,7 +5,7 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * Resumen de ventas (mismos campos que el monolito). unidadesEnStock es el único dato que no está
+ * Resumen de ventas. unidadesEnStock es el único dato que no está
  * en pedidos: se pide a catalogo y queda en null si catalogo no responde (el resto del reporte sigue).
  */
 @Schema(description = "Resumen de ventas para el panel de reportes")

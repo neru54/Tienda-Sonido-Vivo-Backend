@@ -16,7 +16,7 @@ import cl.sonidovivo.common.exception.ReglaNegocioException;
 import cl.sonidovivo.common.util.Textos;
 
 /**
- * Reglas de categorías (las mismas del monolito):
+ * Reglas de categorías:
  *  - El id se deriva del nombre (slug) y no cambia al renombrar.
  *  - No puede haber dos categorías con el mismo nombre.
  *  - No se puede eliminar una categoría que tiene productos (ambas tablas viven en este servicio).

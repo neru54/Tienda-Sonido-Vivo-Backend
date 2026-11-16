@@ -24,7 +24,7 @@ import cl.sonidovivo.usuarios.repository.UsuarioRepository;
 
 /**
  * Carga los 3 usuarios de demostración (Administrador, Vendedor y Cliente) si la tabla está vacía.
- * Los datos están en resources/semilla/usuarios.json (los mismos del monolito) y las contraseñas
+ * Los datos están en resources/semilla/usuarios.json y las contraseñas
  * se guardan con BCrypt. Se desactiva con SEMILLA=false.
  */
 @Component

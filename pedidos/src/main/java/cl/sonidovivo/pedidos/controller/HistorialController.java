@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Historial de compras. Las rutas están bajo /usuarios porque así las usa el frontend (las mismas del
- * monolito), pero los DATOS son boletas: el Gateway envía estas dos rutas a pedidos y el resto de
+ * Historial de compras. Las rutas están bajo /usuarios porque así las usa el frontend,
+ * pero los DATOS son boletas: el Gateway envía estas dos rutas a pedidos y el resto de
  * /usuarios/** al microservicio usuarios. Así no se duplica información entre servicios.
  */
 @RestController

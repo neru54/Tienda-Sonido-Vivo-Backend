@@ -6,8 +6,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * Boleta con su detalle. MISMA forma que en el monolito (cliente, direccion, items...) para que el
- * frontend no cambie. La construye mapper/BoletaMapper a partir de la entidad.
+ * Boleta con su detalle. Forma (cliente, direccion, items...) que espera el
+ * frontend. La construye mapper/BoletaMapper a partir de la entidad.
  */
 @Schema(description = "Boleta (cabecera + detalle)")
 public record BoletaResponse(

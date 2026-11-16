@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 /**
  * Tabla DETALLE_BOLETA: una fila por producto comprado.
  *
- * Diferencia con el monolito: allí tenía una FK a PRODUCTO. Aquí el producto vive en otro esquema,
+ * Sin FK a PRODUCTO: el producto vive en otro esquema,
  * así que se guarda su CÓDIGO (referencia por ID) y además una copia del nombre y la categoría que
  * tenía al momento de la venta. Con eso los reportes se calculan sin consultar a catalogo, y la
  * boleta no cambia aunque después el producto se renombre o cambie de precio.

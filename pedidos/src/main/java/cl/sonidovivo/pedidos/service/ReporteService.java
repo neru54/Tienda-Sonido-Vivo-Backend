@@ -17,7 +17,7 @@ import cl.sonidovivo.pedidos.model.DetalleBoleta;
 import cl.sonidovivo.pedidos.repository.BoletaRepository;
 
 /**
- * Reportes de ventas (mismo cálculo que el monolito) sobre las boletas PAGADAS.
+ * Reportes de ventas sobre las boletas PAGADAS.
  * Nombre y categoría salen del propio detalle (guardados al vender), así que solo
  * "unidadesEnStock" requiere preguntarle a catalogo.
  */

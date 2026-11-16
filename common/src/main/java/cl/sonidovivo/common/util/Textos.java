@@ -3,7 +3,7 @@ package cl.sonidovivo.common.util;
 import java.text.Normalizer;
 import java.util.Locale;
 
-/** Funciones de texto puras usadas por los servicios (iguales a las del monolito). */
+/** Funciones de texto puras usadas por los servicios. */
 public final class Textos {
 
 	private Textos() {

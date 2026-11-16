@@ -25,7 +25,7 @@ import cl.sonidovivo.common.util.Textos;
 
 /**
  * Descuento de stock de una compra (lo llama SOLO pedidos, por /internal/ventas).
- * Es la mitad "catálogo" del checkout del monolito, en UNA transacción local de este esquema:
+ * Es la parte "catálogo" del checkout, en UNA transacción local de este esquema:
  *
  *  0. Idempotencia: si la referencia (n.º de boleta) ya se registró, se devuelve ese comprobante y
  *     NO se descuenta de nuevo. Si llega la misma referencia con otros productos -> 409.
