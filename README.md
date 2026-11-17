@@ -108,6 +108,6 @@ Las carga la semilla de `usuarios` si la tabla está vacía (contraseñas con BC
 powershell -ExecutionPolicy Bypass -File scripts\humo.ps1    # de punta a punta contra el Gateway en marcha
 ```
 
-Último resultado (15-11-2026): **45 pruebas, 0 fallos**. Por módulo: common 4, usuarios 10, catalogo 15, pedidos 14 y gateway 2. JaCoCo: 76,4 % de instrucciones y 75,1 % de líneas (informe en `<módulo>/target/site/jacoco/index.html`).
+Último resultado (17-11-2026): **48 pruebas, 0 fallos**. Por módulo: common 4, usuarios 10, catalogo 15, pedidos 17 y gateway 2. JaCoCo mide solo la lógica (paquetes `controller` y `service`) y el build falla si un módulo baja del 80 % de líneas: 91,7 % de líneas y 87,9 % de ramas en total (usuarios 90,9 %, catalogo 88,6 %, pedidos 95,3 %; informe en `<módulo>/target/site/jacoco/index.html`).
 
-Las pruebas se concentran en lo importante: reglas de negocio de cada servicio con Mockito (`UsuarioServiceTest`, `CatalogoReglasTest`, `VentaServiceTest`, `BoletaServiceTest`), el JWT (`JwtUtilTest`), una prueba de API por servicio para login y permisos por rol, y el enrutamiento del Gateway. Usan H2 en memoria (`src/test/resources/application-h2.yml`) y no necesitan MySQL; en `pedidos`, el cliente de catálogo se simula con Mockito.
+Las pruebas se concentran en lo importante: reglas de negocio de cada servicio con Mockito (`UsuarioServiceTest`, `CatalogoReglasTest`, `VentaServiceTest`, `BoletaServiceTest`, `ReporteServiceTest`), el JWT (`JwtUtilTest`), una prueba de API por servicio para login y permisos por rol, y el enrutamiento del Gateway. Usan H2 en memoria (`src/test/resources/application-h2.yml`) y no necesitan MySQL; en `pedidos`, el cliente de catálogo se simula con Mockito.
